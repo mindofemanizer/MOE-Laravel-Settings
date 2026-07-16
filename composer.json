@@ -1,0 +1,44 @@
+{
+    "name": "moe/laravel-settings",
+    "description": "Global key-value settings for Laravel — typed, cached, encrypted-at-rest",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MindOfEmanizer"
+        }
+    ],
+    "keywords": ["laravel", "settings", "config", "key-value", "moe"],
+    "autoload": {
+        "psr-4": {
+            "Moe\\Settings\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Moe\\Settings\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/cache": "^11.0|^12.0|^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^10.5"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Moe\\Settings\\MoeSettingsServiceProvider"
+            ],
+            "aliases": {
+                "Setting": "Moe\\Settings\\Facades\\Setting"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
