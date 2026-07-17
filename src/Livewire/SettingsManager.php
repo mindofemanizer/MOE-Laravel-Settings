@@ -147,7 +147,7 @@ class SettingsManager extends Component
 
     public function render()
     {
-        return view('moe-settings::settings-manager')
+        return view('moe-settings::livewire.settings-manager')
             ->layout('moe-settings::layouts.app');
     }
 }
