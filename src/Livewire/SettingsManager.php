@@ -4,6 +4,7 @@ namespace Moe\Settings\Livewire;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -60,6 +61,16 @@ class SettingsManager extends Component
     public function getGroupsProperty(): array
     {
         return SettingDefinitions::groups();
+    }
+
+    /** Listener: dipanggil dari parent (settings.blade.php) saat tab horizontal diklik. */
+    #[On('switch-settings-tab')]
+    public function switchTab(string $tab): void
+    {
+        $groups = SettingDefinitions::groups();
+        if (isset($groups[$tab])) {
+            $this->activeTab = $tab;
+        }
     }
 
     public function getActiveGroupProperty(): ?SettingGroup
