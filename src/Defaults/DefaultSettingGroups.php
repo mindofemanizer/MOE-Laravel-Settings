@@ -25,6 +25,8 @@ class DefaultSettingGroups
             new SettingField('contact_phone', 'Telepon / WA', SettingField::TYPE_TEXT, '', 'general', 'Nomor telepon/WhatsApp kontak.'),
             new SettingField('currency', 'Mata Uang', SettingField::TYPE_TEXT, 'IDR', 'general', 'Kode mata uang (ISO).'),
             new SettingField('maintenance_mode', 'Mode Maintenance', SettingField::TYPE_TOGGLE, false, 'general', 'Aktifkan untuk nonaktifkan akses publik.'),
+            new SettingField('auto_confirm_orders', 'Konfirmasi Otomatis Pesanan', SettingField::TYPE_TOGGLE, true, 'general', 'Konfirmasi pesanan otomatis setelah pembayaran.'),
+            new SettingField('search_engine_enabled', 'Mesin Pencari Aktif', SettingField::TYPE_TOGGLE, true, 'general', 'Tampilkan kolom pencarian di toko.'),
             new SettingField('search_engine_indexing', 'Index Search Engine', SettingField::TYPE_TOGGLE, true, 'general', 'Izinkan Google/Bing mengindeks.'),
             new SettingField('timezone', 'Timezone', SettingField::TYPE_TEXT, 'Asia/Jakarta', 'general', 'Default timezone aplikasi.'),
             new SettingField('date_format', 'Format Tanggal', SettingField::TYPE_TEXT, 'd M Y', 'general', 'Format tanggal PHP.'),
