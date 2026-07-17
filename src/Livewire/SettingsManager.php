@@ -73,6 +73,16 @@ class SettingsManager extends Component
         }
     }
 
+    /** Listener: dipanggil dari komponen kustom anak (jika ada) saat nilainya berubah. */
+    #[On('settings-field-updated')]
+    public function updateFieldValue(string $key, $value): void
+    {
+        // Hanya update jika field tersebut memang ada
+        if (isset($this->values[$key])) {
+            $this->values[$key] = $value;
+        }
+    }
+
     public function getActiveGroupProperty(): ?SettingGroup
     {
         return SettingDefinitions::group($this->activeTab);

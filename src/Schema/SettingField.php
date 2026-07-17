@@ -17,6 +17,9 @@ class SettingField
     public const TYPE_PASSWORD = 'password'; // disimpan sebagai encrypted
     public const TYPE_NUMBER = 'number';
     public const TYPE_IMAGE = 'image'; // upload file, disimpan sebagai path string
+    public const TYPE_LIVEWIRE_COMPONENT = 'livewire_component'; // render komponen kustom host app
+
+    public ?string $componentName = null; // nama komponen livewire yang akan dirender
 
     public function __construct(
         public string $key,
@@ -30,6 +33,12 @@ class SettingField
         public string $placeholder = '',
     ) {}
 
+    public function component(string $name): self
+    {
+        $this->componentName = $name;
+        return $this;
+    }
+
     /** Tipe penyimpanan di DB (encrypted bila password/sensitive). */
     public function storageType(): string
     {
@@ -39,7 +48,7 @@ class SettingField
         if ($this->type === self::TYPE_IMAGE) {
             return 'string';
         }
-        if ($this->type === self::TYPE_CHECKBOX_GROUP || $this->type === self::TYPE_SELECT && ! empty($this->options)) {
+        if ($this->type === self::TYPE_CHECKBOX_GROUP || $this->type === self::TYPE_LIVEWIRE_COMPONENT || ($this->type === self::TYPE_SELECT && ! empty($this->options))) {
             return 'json';
         }
         if ($this->type === self::TYPE_TOGGLE || $this->type === self::TYPE_NUMBER) {

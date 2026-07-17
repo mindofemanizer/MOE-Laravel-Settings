@@ -32,7 +32,7 @@
 
                     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
                         @foreach ($group->fields as $field)
-                            <div class="md:col-span-{{ $field->type === \Moe\Settings\Schema\SettingField::TYPE_TEXTAREA ? 2 : 1 }}">
+                            <div class="md:col-span-{{ in_array($field->type, [\Moe\Settings\Schema\SettingField::TYPE_TEXTAREA, \Moe\Settings\Schema\SettingField::TYPE_LIVEWIRE_COMPONENT]) ? 2 : 1 }} space-y-1">
                                 <label class="mb-1 block text-sm font-semibold text-gray-700">
                                     {{ $field->label }}
                                 </label>
@@ -68,6 +68,9 @@
                                         <img src="{{ asset($values[$field->key]) }}" alt="{{ $field->label }}" class="mb-2 h-20 w-20 rounded-lg border border-gray-200 object-cover">
                                     @endif
                                     <input type="file" wire:model="imageUploads.{{ $field->key }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+
+                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_LIVEWIRE_COMPONENT && $field->componentName)
+                                    @livewire($field->componentName, ['key' => $field->key, 'value' => $this->values[$field->key] ?? null], key($field->key))
 
                                 @else
                                     <input
