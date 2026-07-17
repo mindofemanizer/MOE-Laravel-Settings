@@ -73,11 +73,18 @@ class SettingsManager extends Component
             }
         }
 
+        $changes = [];
         foreach ($group->fields as $field) {
-            $this->persistField($field);
+            $changes = array_merge($changes, $this->persistField($field));
         }
 
         Cache::flush();
+
+        // Panccarkan event agar app bisa mencatat ke activity/audit log.
+        if (! empty($changes) && class_exists(\Moe\Settings\Events\SettingsSaved::class)) {
+            event(new \Moe\Settings\Events\SettingsSaved($changes, $group->key));
+        }
+
         session()->flash('settings_saved', 'Pengaturan berhasil disimpan.');
     }
 
@@ -99,19 +106,19 @@ class SettingsManager extends Component
         return $path;
     }
 
-    protected function persistField(SettingField $field): void
+    protected function persistField(SettingField $field): array
     {
         $key = $field->key;
         $raw = $this->values[$key] ?? null;
 
         // Password kosong + sudah ada nilai → jangan overwrite (biarkan nilai lama)
         if ($field->isEncrypted() && $raw === '' && ($this->passwordMask[$key] ?? false)) {
-            return;
+            return [];
         }
 
         // Image kosong → biarkan nilai lama (jangan hapus)
         if ($field->type === SettingField::TYPE_IMAGE && ($raw === '' || $raw === null)) {
-            return;
+            return [];
         }
 
         if ($field->type === SettingField::TYPE_TOGGLE) {
@@ -122,7 +129,20 @@ class SettingsManager extends Component
             $raw = array_values(array_filter($raw));
         }
 
+        $old = \Setting::get($key);
+        $changed = $old != $raw; // loose compare: jangan log bila nilai sama
+
         \Setting::set($key, $raw, $field->storageType(), $field->group, $field->description);
+
+        if (! $changed) {
+            return [];
+        }
+
+        // Jangan ekspos nilai secret/encrypted ke log
+        $oldLog = $field->isEncrypted() ? ($old !== null && $old !== '' ? '••••••••' : null) : $old;
+        $newLog = $field->isEncrypted() ? ($raw !== null && $raw !== '' ? '••••••••' : null) : $raw;
+
+        return [$key => ['old' => $oldLog, 'new' => $newLog]];
     }
 
     public function render()
