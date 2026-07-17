@@ -48,7 +48,7 @@ class DefaultSettingGroups
             new SettingField('mail_host', 'SMTP Host', SettingField::TYPE_TEXT, '', 'mail'),
             new SettingField('mail_port', 'SMTP Port', SettingField::TYPE_NUMBER, 587, 'mail'),
             new SettingField('mail_username', 'SMTP User', SettingField::TYPE_TEXT, '', 'mail'),
-            new SettingField('mail_password', 'SMTP Password', SettingField::TYPE_PASSWORD, '', 'mail', null, true),
+            new SettingField('mail_password', 'SMTP Password', SettingField::TYPE_PASSWORD, '', 'mail', description: null, sensitive: true),
             new SettingField('mail_encryption', 'Enkripsi', SettingField::TYPE_SELECT, 'tls', 'mail', null, ['tls' => 'TLS', 'ssl' => 'SSL', 'null' => 'None']),
             new SettingField('mail_from_address', 'From Address', SettingField::TYPE_TEXT, '', 'mail'),
             new SettingField('mail_from_name', 'From Name', SettingField::TYPE_TEXT, '', 'mail'),
@@ -57,8 +57,8 @@ class DefaultSettingGroups
         // === STORAGE (R2 / local) ===
         SettingDefinitions::register(new SettingGroup('storage', 'Penyimpanan', 'cloud', [
             new SettingField('filesystem_default', 'Default Disk', SettingField::TYPE_SELECT, 'local', 'storage', null, ['local' => 'Lokal (Laravel)', 'r2' => 'Cloudflare R2']),
-            new SettingField('r2_key', 'R2 Access Key', SettingField::TYPE_PASSWORD, '', 'storage', null, true),
-            new SettingField('r2_secret', 'R2 Secret Key', SettingField::TYPE_PASSWORD, '', 'storage', null, true),
+            new SettingField('r2_key', 'R2 Access Key', SettingField::TYPE_PASSWORD, '', 'storage', description: null, sensitive: true),
+            new SettingField('r2_secret', 'R2 Secret Key', SettingField::TYPE_PASSWORD, '', 'storage', description: null, sensitive: true),
             new SettingField('r2_bucket', 'R2 Bucket', SettingField::TYPE_TEXT, '', 'storage'),
             new SettingField('r2_endpoint', 'R2 Endpoint', SettingField::TYPE_TEXT, '', 'storage'),
             new SettingField('r2_region', 'R2 Region', SettingField::TYPE_TEXT, 'auto', 'storage'),
@@ -98,15 +98,15 @@ class DefaultSettingGroups
             new SettingField('pg_midtrans_enabled', 'Midtrans Aktif', SettingField::TYPE_TOGGLE, false, 'payment'),
             new SettingField('pg_midtrans_mode', 'Midtrans Mode', SettingField::TYPE_SELECT, 'sandbox', 'payment', null, ['sandbox' => 'Sandbox', 'production' => 'Production']),
             new SettingField('pg_midtrans_client_key', 'Midtrans Client Key', SettingField::TYPE_TEXT, '', 'payment'),
-            new SettingField('pg_midtrans_server_key', 'Midtrans Server Key', SettingField::TYPE_PASSWORD, '', 'payment', null, true),
+            new SettingField('pg_midtrans_server_key', 'Midtrans Server Key', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
             new SettingField('pg_midtrans_channels', 'Midtrans Channel', SettingField::TYPE_CHECKBOX_GROUP, ['gopay', 'bank_transfer', 'credit_card'], 'payment', null, [
                 'wallet' => 'Wallet', 'bank_transfer' => 'Transfer Bank', 'gopay' => 'GoPay', 'ovo' => 'OVO', 'credit_card' => 'Kartu Kredit', 'qris' => 'QRIS',
             ]),
             // Xendit
             new SettingField('pg_xendit_enabled', 'Xendit Aktif', SettingField::TYPE_TOGGLE, false, 'payment'),
             new SettingField('pg_xendit_mode', 'Xendit Mode', SettingField::TYPE_SELECT, 'sandbox', 'payment', null, ['sandbox' => 'Sandbox', 'production' => 'Production']),
-            new SettingField('pg_xendit_api_key', 'Xendit API Key', SettingField::TYPE_PASSWORD, '', 'payment', null, true),
-            new SettingField('pg_xendit_webhook_token', 'Xendit Webhook Token', SettingField::TYPE_PASSWORD, '', 'payment', null, true),
+            new SettingField('pg_xendit_api_key', 'Xendit API Key', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
+            new SettingField('pg_xendit_webhook_token', 'Xendit Webhook Token', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
             new SettingField('pg_xendit_channels', 'Xendit Channel', SettingField::TYPE_CHECKBOX_GROUP, ['qris', 'bank_transfer', 'ovo'], 'payment', null, [
                 'wallet' => 'Wallet', 'bank_transfer' => 'Transfer Bank', 'gopay' => 'GoPay', 'ovo' => 'OVO', 'credit_card' => 'Kartu Kredit', 'qris' => 'QRIS',
             ]),
