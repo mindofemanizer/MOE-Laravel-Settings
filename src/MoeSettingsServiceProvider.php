@@ -3,7 +3,9 @@
 namespace Moe\Settings;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use Moe\Settings\Defaults\DefaultSettingGroups;
+use Moe\Settings\Livewire\SettingsManager;
 use Moe\Settings\Services\SettingService;
 
 class MoeSettingsServiceProvider extends ServiceProvider
@@ -21,6 +23,9 @@ class MoeSettingsServiceProvider extends ServiceProvider
     {
         // Daftarkan grup setting generic (sama di semua app).
         DefaultSettingGroups::register();
+
+        // Daftarkan Livewire component agar bisa dipanggil via <livewire:settings-manager/>
+        Livewire::component('settings-manager', SettingsManager::class);
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'moe-settings');
 
