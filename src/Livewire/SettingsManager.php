@@ -3,7 +3,10 @@
 namespace Moe\Settings\Livewire;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 use Moe\Settings\Schema\SettingField;
 use Moe\Settings\Schema\SettingGroup;
 use Moe\Settings\SettingDefinitions;
@@ -15,6 +18,8 @@ use Moe\Settings\SettingDefinitions;
  */
 class SettingsManager extends Component
 {
+    use WithFileUploads;
+
     public string $activeTab = '';
 
     /** Nilai form key => value, di-load dari DB saat mount. */
@@ -22,6 +27,9 @@ class SettingsManager extends Component
 
     /** Field password yang dikosongkan di form (jangan tampilkan ciphertext). */
     public array $passwordMask = [];
+
+    /** Temporary upload per field image (key => TemporaryUploadedFile). */
+    public array $imageUploads = [];
 
     public function mount(): void
     {
@@ -57,12 +65,38 @@ class SettingsManager extends Component
             return;
         }
 
+        // Proses upload image dulu (sebelum persist)
+        foreach ($group->fields as $field) {
+            if ($field->type === SettingField::TYPE_IMAGE && ! empty($this->imageUploads[$field->key])) {
+                $this->values[$field->key] = $this->storeImage($field->key, $this->imageUploads[$field->key]);
+                unset($this->imageUploads[$field->key]);
+            }
+        }
+
         foreach ($group->fields as $field) {
             $this->persistField($field);
         }
 
         Cache::flush();
         session()->flash('settings_saved', 'Pengaturan berhasil disimpan.');
+    }
+
+    /**
+     * Simpan file image. App bisa override behaviour lewat config
+     * 'moe-settings.image_uploader' (closure: fn($key, $file) => $path).
+     */
+    protected function storeImage(string $key, TemporaryUploadedFile $file): string
+    {
+        $uploader = config('moe-settings.image_uploader');
+        if (is_callable($uploader)) {
+            return $uploader($key, $file);
+        }
+
+        $disk = config('moe-settings.image_disk', 'public');
+        $dir = config('moe-settings.image_dir', 'settings');
+        $path = $file->store($dir, $disk);
+
+        return $path;
     }
 
     protected function persistField(SettingField $field): void
@@ -72,6 +106,11 @@ class SettingsManager extends Component
 
         // Password kosong + sudah ada nilai → jangan overwrite (biarkan nilai lama)
         if ($field->isEncrypted() && $raw === '' && ($this->passwordMask[$key] ?? false)) {
+            return;
+        }
+
+        // Image kosong → biarkan nilai lama (jangan hapus)
+        if ($field->type === SettingField::TYPE_IMAGE && ($raw === '' || $raw === null)) {
             return;
         }
 

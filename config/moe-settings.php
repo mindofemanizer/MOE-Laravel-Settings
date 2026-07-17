@@ -26,4 +26,13 @@ return [
     'defaults' => [
         // 'app.name' => ['value' => 'My App', 'type' => 'string', 'group' => 'general', 'description' => 'Application name'],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Image upload (TYPE_IMAGE fields)
+    |--------------------------------------------------------------------------
+    */
+    'image_disk' => 'public',
+    'image_dir' => 'settings',
+    'image_uploader' => null, // closure: fn(string $key, \Livewire\Features\SupportFileUploads\TemporaryUploadedFile $file): string
 ];

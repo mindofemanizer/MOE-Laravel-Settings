@@ -16,6 +16,7 @@ class SettingField
     public const TYPE_CHECKBOX_GROUP = 'checkbox_group';
     public const TYPE_PASSWORD = 'password'; // disimpan sebagai encrypted
     public const TYPE_NUMBER = 'number';
+    public const TYPE_IMAGE = 'image'; // upload file, disimpan sebagai path string
 
     public function __construct(
         public string $key,
@@ -34,6 +35,9 @@ class SettingField
     {
         if ($this->type === self::TYPE_PASSWORD || $this->sensitive) {
             return 'encrypted';
+        }
+        if ($this->type === self::TYPE_IMAGE) {
+            return 'string';
         }
         if ($this->type === self::TYPE_CHECKBOX_GROUP || $this->type === self::TYPE_SELECT && ! empty($this->options)) {
             return 'json';

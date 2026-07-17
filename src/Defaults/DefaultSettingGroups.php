@@ -93,26 +93,28 @@ class DefaultSettingGroups
         ]));
 
         // === PAYMENT ===
+        // Key menggunakan dot-notation yang sama dengan legacy KiosKit
+        // (pg.midtrans.*, pg.xendit.*, pg.manual.*) agar service app tidak berubah.
         SettingDefinitions::register(new SettingGroup('payment', 'Pembayaran', 'payments', [
             // Midtrans
-            new SettingField('pg_midtrans_enabled', 'Midtrans Aktif', SettingField::TYPE_TOGGLE, false, 'payment'),
-            new SettingField('pg_midtrans_mode', 'Midtrans Mode', SettingField::TYPE_SELECT, 'sandbox', 'payment', null, ['sandbox' => 'Sandbox', 'production' => 'Production']),
-            new SettingField('pg_midtrans_client_key', 'Midtrans Client Key', SettingField::TYPE_TEXT, '', 'payment'),
-            new SettingField('pg_midtrans_server_key', 'Midtrans Server Key', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
-            new SettingField('pg_midtrans_channels', 'Midtrans Channel', SettingField::TYPE_CHECKBOX_GROUP, ['gopay', 'bank_transfer', 'credit_card'], 'payment', null, [
+            new SettingField('pg.midtrans.enabled', 'Midtrans Aktif', SettingField::TYPE_TOGGLE, false, 'payment'),
+            new SettingField('pg.midtrans.mode', 'Midtrans Mode', SettingField::TYPE_SELECT, 'sandbox', 'payment', null, ['sandbox' => 'Sandbox', 'production' => 'Production']),
+            new SettingField('pg.midtrans.client_key', 'Midtrans Client Key', SettingField::TYPE_TEXT, '', 'payment'),
+            new SettingField('pg.midtrans.server_key', 'Midtrans Server Key', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
+            new SettingField('pg.midtrans.channels', 'Midtrans Channel', SettingField::TYPE_CHECKBOX_GROUP, ['gopay', 'bank_transfer', 'credit_card'], 'payment', null, [
                 'wallet' => 'Wallet', 'bank_transfer' => 'Transfer Bank', 'gopay' => 'GoPay', 'ovo' => 'OVO', 'credit_card' => 'Kartu Kredit', 'qris' => 'QRIS',
             ]),
             // Xendit
-            new SettingField('pg_xendit_enabled', 'Xendit Aktif', SettingField::TYPE_TOGGLE, false, 'payment'),
-            new SettingField('pg_xendit_mode', 'Xendit Mode', SettingField::TYPE_SELECT, 'sandbox', 'payment', null, ['sandbox' => 'Sandbox', 'production' => 'Production']),
-            new SettingField('pg_xendit_api_key', 'Xendit API Key', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
-            new SettingField('pg_xendit_webhook_token', 'Xendit Webhook Token', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
-            new SettingField('pg_xendit_channels', 'Xendit Channel', SettingField::TYPE_CHECKBOX_GROUP, ['qris', 'bank_transfer', 'ovo'], 'payment', null, [
+            new SettingField('pg.xendit.enabled', 'Xendit Aktif', SettingField::TYPE_TOGGLE, false, 'payment'),
+            new SettingField('pg.xendit.mode', 'Xendit Mode', SettingField::TYPE_SELECT, 'sandbox', 'payment', null, ['sandbox' => 'Sandbox', 'production' => 'Production']),
+            new SettingField('pg.xendit.api_key', 'Xendit API Key', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
+            new SettingField('pg.xendit.webhook_token', 'Xendit Webhook Token', SettingField::TYPE_PASSWORD, '', 'payment', description: null, sensitive: true),
+            new SettingField('pg.xendit.channels', 'Xendit Channel', SettingField::TYPE_CHECKBOX_GROUP, ['qris', 'bank_transfer', 'ovo'], 'payment', null, [
                 'wallet' => 'Wallet', 'bank_transfer' => 'Transfer Bank', 'gopay' => 'GoPay', 'ovo' => 'OVO', 'credit_card' => 'Kartu Kredit', 'qris' => 'QRIS',
             ]),
             // Manual
-            new SettingField('pg_manual_enabled', 'Manual Aktif', SettingField::TYPE_TOGGLE, true, 'payment'),
-            new SettingField('pg_manual_channels', 'Manual Channel', SettingField::TYPE_CHECKBOX_GROUP, ['bank_transfer', 'wallet'], 'payment', null, [
+            new SettingField('pg.manual.enabled', 'Manual Aktif', SettingField::TYPE_TOGGLE, true, 'payment'),
+            new SettingField('pg.manual.channels', 'Manual Channel', SettingField::TYPE_CHECKBOX_GROUP, ['bank_transfer', 'wallet'], 'payment', null, [
                 'wallet' => 'Wallet', 'bank_transfer' => 'Transfer Bank', 'gopay' => 'GoPay', 'ovo' => 'OVO', 'credit_card' => 'Kartu Kredit', 'qris' => 'QRIS',
             ]),
         ]));

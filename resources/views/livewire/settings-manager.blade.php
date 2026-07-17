@@ -59,7 +59,13 @@
                                     </div>
 
                                 @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_PASSWORD)
-                                    <input type="password" wire:model="values.{{ $field->key }}" placeholder="{{ $field->passwordMask[$field->key] ?? false ? '•••••••• (tidak diubah)' : $field->placeholder }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                                    <input type="password" wire:model="values.{{ $field->key }}" placeholder="{{ $passwordMask[$field->key] ?? false ? '•••••••• (tidak diubah)' : $field->placeholder }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+
+                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_IMAGE)
+                                    @if (! empty($values[$field->key]))
+                                        <img src="{{ asset($values[$field->key]) }}" alt="{{ $field->label }}" class="mb-2 h-20 w-20 rounded-lg border border-gray-200 object-cover">
+                                    @endif
+                                    <input type="file" wire:model="imageUploads.{{ $field->key }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
 
                                 @else
                                     <input
