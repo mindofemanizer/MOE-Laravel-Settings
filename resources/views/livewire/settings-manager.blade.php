@@ -6,7 +6,8 @@
     @endif
 
     <div class="flex flex-col gap-6 lg:flex-row">
-        {{-- Sidebar tabs --}}
+        {{-- Sidebar tabs (hanya bila tidak di-embed) --}}
+        @if (! $embedded)
         <div class="lg:w-64 lg:flex-shrink-0">
             <nav class="space-y-1">
                 @foreach ($this->groups as $g)
@@ -20,9 +21,10 @@
                 @endforeach
             </nav>
         </div>
+        @endif
 
         {{-- Panel --}}
-        <div class="flex-1">
+        <div class="flex-1 @if($embedded) w-full @endif">
             @php $group = $this->activeGroup; @endphp
             @if ($group)
                 <form wire:submit.prevent="save" class="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">

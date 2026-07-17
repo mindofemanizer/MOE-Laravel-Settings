@@ -31,10 +31,19 @@ class SettingsManager extends Component
     /** Temporary upload per field image (key => TemporaryUploadedFile). */
     public array $imageUploads = [];
 
+    /** Bila true, tidak render sidebar nav sendiri (host app yg sediakan nav). */
+    public bool $embedded = false;
+
     public function mount(): void
     {
         $groups = SettingDefinitions::groups();
         $this->activeTab = array_key_first($groups) ?? '';
+
+        // Izinkan host app membuka tab tertentu via query string ?tab=xxx
+        $tab = request()->query('tab');
+        if ($tab && isset($groups[$tab])) {
+            $this->activeTab = $tab;
+        }
 
         foreach (SettingDefinitions::allFields() as $key => $field) {
             $stored = \Setting::get($key, $field->default);
