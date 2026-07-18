@@ -115,7 +115,11 @@ class SettingsManager extends Component
             event(new \Moe\Settings\Events\SettingsSaved($changes, $group->key));
         }
 
-        session()->flash('settings_saved', 'Pengaturan berhasil disimpan.');
+        $message = 'Pengaturan berhasil disimpan.';
+        session()->flash('settings_saved', $message);
+
+        // Toast host app (mis. layouts/admin) mendengarkan event Livewire `notify`.
+        $this->dispatch('notify', type: 'success', message: $message);
     }
 
     /**

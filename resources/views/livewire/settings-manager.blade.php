@@ -1,100 +1,157 @@
-<div class="space-y-6">
-    @if (session('settings_saved'))
-        <div class="rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">
-            {{ session('settings_saved') }}
-        </div>
-    @endif
+@php
+    $group = $this->activeGroup;
+    $inputClass = 'w-full min-w-0 border border-outline-variant/40 rounded-lg px-3.5 py-2.5 text-body text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors placeholder:text-outline-variant';
+@endphp
 
-    <div class="flex flex-col gap-6 lg:flex-row">
-        {{-- Sidebar tabs (hanya bila tidak di-embed) --}}
-        @if (! $embedded)
-        <div class="lg:w-64 lg:flex-shrink-0">
-            <nav class="space-y-1">
-                @foreach ($this->groups as $g)
-                    <button
-                        wire:click="$set('activeTab', '{{ $g->key }}')"
-                        class="w-full rounded-r-lg px-4 py-3 text-left text-sm transition-all {{ $activeTab === $g->key ? 'bg-primary/10 font-semibold text-primary' : 'text-gray-600 hover:bg-gray-100' }}"
-                    >
-                        <span class="material-symbols-outlined align-middle text-base">{{ $g->icon }}</span>
-                        <span class="ml-1">{{ $g->label }}</span>
-                    </button>
-                @endforeach
-            </nav>
-        </div>
-        @endif
+<div class="w-full min-w-0">
+    @if ($group)
+        <form wire:submit.prevent="save" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-5">
+                @foreach ($group->fields as $field)
+                    @php
+                        $isWide = in_array($field->type, [
+                            \Moe\Settings\Schema\SettingField::TYPE_TEXTAREA,
+                            \Moe\Settings\Schema\SettingField::TYPE_LIVEWIRE_COMPONENT,
+                            \Moe\Settings\Schema\SettingField::TYPE_CHECKBOX_GROUP,
+                        ], true);
+                        $isToggle = $field->type === \Moe\Settings\Schema\SettingField::TYPE_TOGGLE;
+                    @endphp
 
-        {{-- Panel --}}
-        <div class="flex-1 @if($embedded) w-full @endif">
-            @php $group = $this->activeGroup; @endphp
-            @if ($group)
-                <form wire:submit.prevent="save" class="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h3 class="text-lg font-bold text-gray-900">{{ $group->label }}</h3>
-
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        @foreach ($group->fields as $field)
-                            <div class="md:col-span-{{ in_array($field->type, [\Moe\Settings\Schema\SettingField::TYPE_TEXTAREA, \Moe\Settings\Schema\SettingField::TYPE_LIVEWIRE_COMPONENT]) ? 2 : 1 }} space-y-1">
-                                <label class="mb-1 block text-sm font-semibold text-gray-700">
-                                    {{ $field->label }}
-                                </label>
-
-                                @if ($field->type === \Moe\Settings\Schema\SettingField::TYPE_TOGGLE)
-                                    <input type="checkbox" wire:model="values.{{ $field->key }}" class="rounded border-gray-300">
-
-                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_TEXTAREA)
-                                    <textarea wire:model="values.{{ $field->key }}" rows="3" placeholder="{{ $field->placeholder }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"></textarea>
-
-                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_SELECT)
-                                    <select wire:model="values.{{ $field->key }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                                        @foreach ($field->options as $optVal => $optLabel)
-                                            <option value="{{ $optVal }}">{{ $optLabel }}</option>
-                                        @endforeach
-                                    </select>
-
-                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_CHECKBOX_GROUP)
-                                    <div class="flex flex-wrap gap-3">
-                                        @foreach ($field->options as $optVal => $optLabel)
-                                            <label class="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                                                <input type="checkbox" wire:model="values.{{ $field->key }}" value="{{ $optVal }}" class="rounded border-gray-300">
-                                                <span>{{ $optLabel }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-
-                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_PASSWORD)
-                                    <input type="password" wire:model="values.{{ $field->key }}" placeholder="{{ $passwordMask[$field->key] ?? false ? '•••••••• (tidak diubah)' : $field->placeholder }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-
-                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_IMAGE)
-                                    @if (! empty($values[$field->key]))
-                                        <img src="{{ asset($values[$field->key]) }}" alt="{{ $field->label }}" class="mb-2 h-20 w-20 rounded-lg border border-gray-200 object-cover">
+                    @if ($isToggle)
+                        {{-- Toggle: full-width row, label kiri + switch kanan --}}
+                        <div class="md:col-span-2 min-w-0">
+                            <div class="flex items-start justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low/60 px-4 py-3">
+                                <div class="min-w-0 space-y-0.5">
+                                    <p class="font-body text-body font-semibold text-on-surface">{{ $field->label }}</p>
+                                    @if ($field->description)
+                                        <p class="text-body-sm text-on-surface-variant leading-snug">{{ $field->description }}</p>
                                     @endif
-                                    <input type="file" wire:model="imageUploads.{{ $field->key }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-
-                                @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_LIVEWIRE_COMPONENT && $field->componentName)
-                                    @livewire($field->componentName, ['key' => $field->key, 'value' => $this->values[$field->key] ?? null], key($field->key))
-
-                                @else
-                                    <input
-                                        type="{{ $field->type === \Moe\Settings\Schema\SettingField::TYPE_NUMBER ? 'number' : 'text' }}"
-                                        wire:model="values.{{ $field->key }}"
-                                        placeholder="{{ $field->placeholder }}"
-                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                                    >
-                                @endif
-
-                                @if ($field->description)
-                                    <p class="mt-1 text-xs text-gray-400">{{ $field->description }}</p>
-                                @endif
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-0.5">
+                                    <input type="checkbox" wire:model="values.{{ $field->key }}" class="sr-only peer" aria-label="{{ $field->label }}">
+                                    <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @else
+                        <div class="{{ $isWide ? 'md:col-span-2' : '' }} min-w-0 space-y-1.5">
+                            <label class="font-body text-body font-semibold text-on-surface block" for="setting-{{ $field->key }}">
+                                {{ $field->label }}
+                            </label>
 
-                    <div class="pt-2">
-                        <button type="submit" class="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90">
-                            Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
-            @endif
-        </div>
-    </div>
+                            @if ($field->type === \Moe\Settings\Schema\SettingField::TYPE_TEXTAREA)
+                                <textarea
+                                    id="setting-{{ $field->key }}"
+                                    wire:model="values.{{ $field->key }}"
+                                    rows="3"
+                                    placeholder="{{ $field->placeholder }}"
+                                    class="{{ $inputClass }} resize-y min-h-[5.5rem]"
+                                ></textarea>
+
+                            @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_SELECT)
+                                <select
+                                    id="setting-{{ $field->key }}"
+                                    wire:model="values.{{ $field->key }}"
+                                    class="{{ $inputClass }} cursor-pointer"
+                                >
+                                    @foreach ($field->options as $optVal => $optLabel)
+                                        <option value="{{ $optVal }}">{{ $optLabel }}</option>
+                                    @endforeach
+                                </select>
+
+                            @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_CHECKBOX_GROUP)
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach ($field->options as $optVal => $optLabel)
+                                        <label class="inline-flex items-center gap-2 border border-outline-variant/40 rounded-lg px-3 py-2 text-body cursor-pointer hover:bg-surface-container transition-colors">
+                                            <input type="checkbox" wire:model="values.{{ $field->key }}" value="{{ $optVal }}" class="rounded border-outline-variant accent-primary">
+                                            <span>{{ $optLabel }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+
+                            @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_PASSWORD)
+                                <input
+                                    id="setting-{{ $field->key }}"
+                                    type="password"
+                                    wire:model="values.{{ $field->key }}"
+                                    placeholder="{{ $passwordMask[$field->key] ?? false ? '•••••••• (tidak diubah)' : $field->placeholder }}"
+                                    class="{{ $inputClass }}"
+                                    autocomplete="new-password"
+                                >
+
+                            @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_IMAGE)
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    @if (! empty($values[$field->key]))
+                                        <img
+                                            src="{{ asset($values[$field->key]) }}"
+                                            alt="{{ $field->label }}"
+                                            class="h-16 w-16 rounded-xl border border-outline-variant/40 object-cover flex-shrink-0"
+                                        >
+                                    @else
+                                        <div class="h-16 w-16 rounded-xl border border-dashed border-outline-variant/50 bg-surface-container-low flex items-center justify-center flex-shrink-0">
+                                            <span class="material-symbols-outlined text-outline text-[22px]">image</span>
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0 flex-1">
+                                        <input
+                                            id="setting-{{ $field->key }}"
+                                            type="file"
+                                            wire:model="imageUploads.{{ $field->key }}"
+                                            accept="image/*"
+                                            class="block w-full text-body-sm text-on-surface-variant file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-body-sm file:font-semibold file:bg-secondary-container file:text-on-secondary-container hover:file:opacity-90 file:cursor-pointer cursor-pointer"
+                                        >
+                                        <div wire:loading wire:target="imageUploads.{{ $field->key }}" class="text-body-sm text-on-surface-variant mt-1">
+                                            Mengunggah…
+                                        </div>
+                                    </div>
+                                </div>
+
+                            @elseif ($field->type === \Moe\Settings\Schema\SettingField::TYPE_LIVEWIRE_COMPONENT && $field->componentName)
+                                @php
+                                    $componentKey  = $field->key;
+                                    $componentVal  = $this->values[$field->key] ?? null;
+                                    $componentName = $field->componentName;
+                                    $isAlpineOnly  = $componentName === 'admin.components.map-picker';
+                                @endphp
+                                @if ($isAlpineOnly)
+                                    @include('livewire.' . str_replace('.', '/', $componentName), [
+                                        'fieldKey'   => $componentKey,
+                                        'fieldValue' => $componentVal,
+                                    ])
+                                @else
+                                    @livewire($componentName, ['key' => $componentKey, 'value' => $componentVal], key($componentKey))
+                                @endif
+
+                            @else
+                                <input
+                                    id="setting-{{ $field->key }}"
+                                    type="{{ $field->type === \Moe\Settings\Schema\SettingField::TYPE_NUMBER ? 'number' : 'text' }}"
+                                    wire:model="values.{{ $field->key }}"
+                                    placeholder="{{ $field->placeholder }}"
+                                    class="{{ $inputClass }}"
+                                >
+                            @endif
+
+                            @if ($field->description)
+                                <p class="text-body-sm text-on-surface-variant leading-snug">{{ $field->description }}</p>
+                            @endif
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+
+            <div class="pt-1 border-t border-surface-container flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3">
+                <button
+                    type="submit"
+                    class="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-primary text-on-primary px-6 py-2.5 rounded-lg font-h3 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60"
+                    wire:loading.attr="disabled"
+                >
+                    <span class="material-symbols-outlined text-icon" wire:loading.remove wire:target="save">save</span>
+                    <span class="material-symbols-outlined text-icon animate-spin" wire:loading wire:target="save">progress_activity</span>
+                    <span wire:loading.remove wire:target="save">Simpan Perubahan</span>
+                    <span wire:loading wire:target="save">Menyimpan…</span>
+                </button>
+            </div>
+        </form>
+    @endif
 </div>
