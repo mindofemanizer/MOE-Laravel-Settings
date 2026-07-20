@@ -52,16 +52,21 @@ class DefaultSettingGroups
             ]),
         ]));
 
-        // === ADDRESS ===
+        // === ADDRESS (struktur Indonesia) ===
         SettingDefinitions::register(new SettingGroup('address', 'Alamat', 'location_on', [
-            new SettingField('address_street', 'Jalan', SettingField::TYPE_TEXT, '', 'address'),
-            new SettingField('address_village', 'Desa/Kelurahan', SettingField::TYPE_TEXT, '', 'address'),
-            new SettingField('address_district', 'Kecamatan', SettingField::TYPE_TEXT, '', 'address'),
-            new SettingField('address_city', 'Kabupaten/Kota', SettingField::TYPE_TEXT, '', 'address'),
-            new SettingField('address_province', 'Provinsi', SettingField::TYPE_TEXT, '', 'address'),
-            new SettingField('address_postal', 'Kode Pos', SettingField::TYPE_TEXT, '', 'address'),
-            new SettingField('address_lat', 'Latitude', SettingField::TYPE_TEXT, '', 'address'),
-            new SettingField('address_lng', 'Longitude', SettingField::TYPE_TEXT, '', 'address'),
+            new SettingField('address_street', 'Nama Jalan', SettingField::TYPE_TEXT, '', 'address', 'Nama jalan/gang saja (tanpa nomor rumah).'),
+            new SettingField('address_house_no', 'No. Rumah / Blok', SettingField::TYPE_TEXT, '', 'address', 'Nomor rumah, blok, atau unit.'),
+            new SettingField('address_rt', 'RT', SettingField::TYPE_TEXT, '', 'address', 'Hanya angka 1–3 digit.'),
+            new SettingField('address_rw', 'RW', SettingField::TYPE_TEXT, '', 'address', 'Hanya angka 1–3 digit.'),
+            new SettingField('address_hamlet', 'Dusun / Kampung', SettingField::TYPE_TEXT, '', 'address', 'Nama dusun/kampung/lingkungan (opsional).'),
+            new SettingField('address_landmark', 'Patokan / Catatan Kurir', SettingField::TYPE_TEXTAREA, '', 'address', 'Patokan yang memudahkan kurir (seberang masjid, dll).'),
+            new SettingField('address_village', 'Desa / Kelurahan', SettingField::TYPE_TEXT, '', 'address', 'Nama desa/kelurahan.'),
+            new SettingField('address_district', 'Kecamatan', SettingField::TYPE_TEXT, '', 'address', 'Nama kecamatan.'),
+            new SettingField('address_city', 'Kabupaten / Kota', SettingField::TYPE_TEXT, '', 'address', 'Nama kabupaten atau kota.'),
+            new SettingField('address_province', 'Provinsi', SettingField::TYPE_TEXT, '', 'address', 'Nama provinsi.'),
+            new SettingField('address_postal_code', 'Kode Pos', SettingField::TYPE_TEXT, '', 'address', '5 digit kode pos.'),
+            new SettingField('address_lat', 'Latitude', SettingField::TYPE_TEXT, '', 'address', 'Koordinat lintang (dari peta).'),
+            new SettingField('address_lng', 'Longitude', SettingField::TYPE_TEXT, '', 'address', 'Koordinat bujur (dari peta).'),
         ]));
 
         // === MAIL (SMTP) ===
