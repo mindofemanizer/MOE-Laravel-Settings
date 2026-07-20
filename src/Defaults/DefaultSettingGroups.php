@@ -28,9 +28,28 @@ class DefaultSettingGroups
             new SettingField('auto_confirm_orders', 'Konfirmasi Otomatis Pesanan', SettingField::TYPE_TOGGLE, true, 'general', 'Konfirmasi pesanan otomatis setelah pembayaran.'),
             new SettingField('search_engine_enabled', 'Mesin Pencari Aktif', SettingField::TYPE_TOGGLE, true, 'general', 'Tampilkan kolom pencarian di toko.'),
             new SettingField('search_engine_indexing', 'Index Search Engine', SettingField::TYPE_TOGGLE, true, 'general', 'Izinkan Google/Bing mengindeks.'),
-            new SettingField('timezone', 'Timezone', SettingField::TYPE_TEXT, 'Asia/Jakarta', 'general', 'Default timezone aplikasi.'),
-            new SettingField('date_format', 'Format Tanggal', SettingField::TYPE_TEXT, 'd M Y', 'general', 'Format tanggal PHP.'),
-            new SettingField('datetime_format', 'Format Tanggal & Waktu', SettingField::TYPE_TEXT, 'd M Y H:i', 'general', 'Format datetime PHP.'),
+            new SettingField('timezone', 'Timezone', SettingField::TYPE_SELECT, 'Asia/Jakarta', 'general', 'Zona waktu operasional.', [
+                'Asia/Jakarta' => 'Asia/Jakarta (WIB, UTC+7)',
+                'Asia/Makassar' => 'Asia/Makassar (WITA, UTC+8)',
+                'Asia/Jayapura' => 'Asia/Jayapura (WIT, UTC+9)',
+                'Asia/Singapore' => 'Asia/Singapore (UTC+8)',
+                'Asia/Kuala_Lumpur' => 'Asia/Kuala_Lumpur (UTC+8)',
+                'UTC' => 'UTC',
+            ]),
+            new SettingField('date_format', 'Format Tanggal', SettingField::TYPE_SELECT, 'd M Y', 'general', 'Format tanggal PHP (helper format_setting_date).', [
+                'd M Y' => '19 Jul 2026 (d M Y)',
+                'd/m/Y' => '19/07/2026 (d/m/Y)',
+                'd-m-Y' => '19-07-2026 (d-m-Y)',
+                'Y-m-d' => '2026-07-19 (Y-m-d)',
+                'd F Y' => '19 Juli 2026 (d F Y)',
+            ]),
+            new SettingField('datetime_format', 'Format Tanggal & Waktu', SettingField::TYPE_SELECT, 'd M Y H:i', 'general', 'Format datetime PHP (helper format_setting_date).', [
+                'd M Y H:i' => '19 Jul 2026 15:30 (d M Y H:i)',
+                'd/m/Y H:i' => '19/07/2026 15:30 (d/m/Y H:i)',
+                'd-m-Y H:i' => '19-07-2026 15:30 (d-m-Y H:i)',
+                'Y-m-d H:i' => '2026-07-19 15:30 (Y-m-d H:i)',
+                'd M Y H:i:s' => '19 Jul 2026 15:30:00 (d M Y H:i:s)',
+            ]),
         ]));
 
         // === ADDRESS ===
@@ -47,13 +66,21 @@ class DefaultSettingGroups
 
         // === MAIL (SMTP) ===
         SettingDefinitions::register(new SettingGroup('mail', 'Email (SMTP)', 'mail', [
-            new SettingField('mail_host', 'SMTP Host', SettingField::TYPE_TEXT, '', 'mail'),
-            new SettingField('mail_port', 'SMTP Port', SettingField::TYPE_NUMBER, 587, 'mail'),
-            new SettingField('mail_username', 'SMTP User', SettingField::TYPE_TEXT, '', 'mail'),
-            new SettingField('mail_password', 'SMTP Password', SettingField::TYPE_PASSWORD, '', 'mail', description: null, sensitive: true),
-            new SettingField('mail_encryption', 'Enkripsi', SettingField::TYPE_SELECT, 'tls', 'mail', null, ['tls' => 'TLS', 'ssl' => 'SSL', 'null' => 'None']),
-            new SettingField('mail_from_address', 'From Address', SettingField::TYPE_TEXT, '', 'mail'),
-            new SettingField('mail_from_name', 'From Name', SettingField::TYPE_TEXT, '', 'mail'),
+            new SettingField('mail_provider', 'Provider Email', SettingField::TYPE_SELECT, 'log', 'mail',
+                'Pilih provider untuk mengisi host/port/enkripsi otomatis (opsional). Kredensial tetap ditempel manual.',
+                ['log' => 'Log (development)', 'brevo' => 'Brevo (Sendinblue)', 'mailgun' => 'Mailgun', 'resend' => 'Resend', 'postmark' => 'Postmark', 'sendgrid' => 'SendGrid', 'gmail' => 'Gmail SMTP', 'outlook' => 'Outlook SMTP', 'amazon_ses' => 'Amazon SES', 'custom' => 'Custom'],
+            ),
+            new SettingField('mail_mailer', 'Driver Mail', SettingField::TYPE_SELECT, 'log', 'mail',
+                'log = development (tulis ke file). smtp = server SMTP. array = testing memori.',
+                ['log' => 'Log (development)', 'smtp' => 'SMTP', 'array' => 'Array (testing)', 'sendmail' => 'Sendmail'],
+            ),
+            new SettingField('mail_host', 'SMTP Host', SettingField::TYPE_TEXT, '', 'mail', 'Hostname server SMTP.'),
+            new SettingField('mail_port', 'SMTP Port', SettingField::TYPE_NUMBER, 587, 'mail', 'Port SMTP (587 STARTTLS, 465 SSL).'),
+            new SettingField('mail_username', 'SMTP User', SettingField::TYPE_TEXT, '', 'mail', 'Username SMTP atau API key login.'),
+            new SettingField('mail_password', 'SMTP Password / Key', SettingField::TYPE_PASSWORD, '', 'mail', 'Password SMTP / app password. Disimpan terenkripsi.', sensitive: true),
+            new SettingField('mail_encryption', 'Enkripsi', SettingField::TYPE_SELECT, 'tls', 'mail', 'Metode enkripsi koneksi SMTP.', ['tls' => 'TLS (STARTTLS)', 'ssl' => 'SSL (SMTPS)', 'null' => 'None']),
+            new SettingField('mail_from_address', 'From Address', SettingField::TYPE_TEXT, '', 'mail', 'Alamat pengirim global (header From).'),
+            new SettingField('mail_from_name', 'From Name', SettingField::TYPE_TEXT, '', 'mail', 'Nama pengirim di inbox penerima.'),
         ]));
 
         // === STORAGE (local / public / R2) ===

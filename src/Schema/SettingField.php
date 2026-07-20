@@ -48,7 +48,9 @@ class SettingField
         if ($this->type === self::TYPE_IMAGE) {
             return 'string';
         }
-        if ($this->type === self::TYPE_CHECKBOX_GROUP || $this->type === self::TYPE_LIVEWIRE_COMPONENT || ($this->type === self::TYPE_SELECT && ! empty($this->options))) {
+        // TYPE_SELECT dengan options tetap string (bukan json — json merusak string skalar).
+        // JSON hanya untuk multi-value: checkbox_group & livewire_component.
+        if ($this->type === self::TYPE_CHECKBOX_GROUP || $this->type === self::TYPE_LIVEWIRE_COMPONENT) {
             return 'json';
         }
         if ($this->type === self::TYPE_TOGGLE || $this->type === self::TYPE_NUMBER) {
