@@ -108,11 +108,79 @@ class DefaultSettingGroups
                 'Public bucket URL (custom domain) agar file bisa diakses via browser. Opsional.'),
         ]));
 
-        // === SECURITY ===
+        // === SECURITY (comprehensive) ===
         SettingDefinitions::register(new SettingGroup('security', 'Keamanan', 'shield', [
-            new SettingField('max_login_attempts', 'Maks Percobaan Login', SettingField::TYPE_NUMBER, 5, 'security'),
-            new SettingField('session_lifetime', 'Session Lifetime (menit)', SettingField::TYPE_NUMBER, 120, 'security'),
-            new SettingField('two_factor_required', 'Wajib 2FA Admin', SettingField::TYPE_TOGGLE, false, 'security'),
+            // ── 1. Session & Autentikasi ──
+            new SettingField('max_login_attempts', 'Maks Login Gagal', SettingField::TYPE_NUMBER, 5, 'security',
+                'Jumlah maks percobaan login sebelum akun dikunci sementara.'),
+            new SettingField('lockout_duration', 'Durasi Lockout (menit)', SettingField::TYPE_NUMBER, 10, 'security',
+                'Berapa menit akun terkunci setelah melebihi maks login gagal.'),
+            new SettingField('session_lifetime', 'Session Lifetime (menit)', SettingField::TYPE_NUMBER, 120, 'security',
+                'Durasi session login admin/vendor/seller.'),
+            new SettingField('session_idle_timeout', 'Idle Timeout (menit)', SettingField::TYPE_NUMBER, 30, 'security',
+                'Auto logout jika tidak ada aktivitas. 0 = nonaktif.'),
+            new SettingField('single_device_session', 'Single Device Session', SettingField::TYPE_TOGGLE, false, 'security',
+                'Logout otomatis dari perangkat lain saat login baru.'),
+            new SettingField('require_email_verification', 'Wajib Verifikasi Email', SettingField::TYPE_TOGGLE, true, 'security',
+                'Akun baru hanya bisa bertransaksi setelah verifikasi email.'),
+
+            // ── 2. Kebijakan Password ──
+            new SettingField('password_min_length', 'Min. Panjang Password', SettingField::TYPE_NUMBER, 8, 'security',
+                'Minimal karakter password. Rekomendasi: 8–12.'),
+            new SettingField('password_require_uppercase', 'Harus Huruf Besar', SettingField::TYPE_TOGGLE, true, 'security',
+                'Password wajib mengandung minimal 1 huruf besar (A-Z).'),
+            new SettingField('password_require_digit', 'Harus Angka', SettingField::TYPE_TOGGLE, true, 'security',
+                'Password wajib mengandung minimal 1 angka (0-9).'),
+            new SettingField('password_require_symbol', 'Harus Simbol', SettingField::TYPE_TOGGLE, true, 'security',
+                'Password wajib mengandung minimal 1 simbol (!@#$% dll).'),
+            new SettingField('password_expiry_days', 'Expiry Password (hari)', SettingField::TYPE_NUMBER, 0, 'security',
+                'Paksa ganti password setiap N hari. 0 = tidak pernah expired.'),
+
+            // ── 3. Two-Factor Authentication ──
+            new SettingField('two_factor_admin', 'Wajib 2FA Admin', SettingField::TYPE_TOGGLE, false, 'security',
+                'Admin harus setup Google Authenticator / TOTP sebelum akses.'),
+            new SettingField('two_factor_vendor', 'Wajib 2FA Vendor', SettingField::TYPE_TOGGLE, false, 'security',
+                'Vendor harus setup TOTP sebelum akses portal vendor.'),
+            new SettingField('two_factor_seller', 'Wajib 2FA Seller', SettingField::TYPE_TOGGLE, false, 'security',
+                'Seller harus setup TOTP sebelum akses dashboard toko.'),
+            new SettingField('two_factor_remember_days', 'Ingat Device 2FA (hari)', SettingField::TYPE_NUMBER, 30, 'security',
+                'Browser tepercaya tidak minta kode 2FA lagi selama N hari.'),
+
+            // ── 4. reCAPTCHA ──
+            new SettingField('recaptcha_enabled', 'Aktifkan reCAPTCHA', SettingField::TYPE_TOGGLE, true, 'security',
+                'Proteksi form publik dengan Google reCAPTCHA v2.'),
+            new SettingField('recaptcha_site_key', 'Site Key (reCAPTCHA)', SettingField::TYPE_TEXT, '', 'security',
+                'Site Key dari Google reCAPTCHA admin console.'),
+            new SettingField('recaptcha_secret_key', 'Secret Key (reCAPTCHA)', SettingField::TYPE_PASSWORD, '', 'security',
+                'Secret Key dari Google reCAPTCHA admin console.', sensitive: true),
+            new SettingField('recaptcha_for_login', 'reCAPTCHA di Login', SettingField::TYPE_TOGGLE, true, 'security',
+                'Terapkan captcha di form login admin & store.'),
+            new SettingField('recaptcha_for_register', 'reCAPTCHA di Register', SettingField::TYPE_TOGGLE, true, 'security',
+                'Terapkan captcha di form pendaftaran seller/vendor.'),
+            new SettingField('recaptcha_threshold', 'Threshold Captcha', SettingField::TYPE_NUMBER, 3, 'security',
+                'Jumlah percobaan gagal sebelum captcha muncul. 1 = selalu captcha.'),
+
+            // ── 5. Pendaftaran & Approval ──
+            new SettingField('registration_enabled', 'Izinkan Pendaftaran', SettingField::TYPE_TOGGLE, true, 'security',
+                'Publik bisa mendaftar sebagai seller/vendor.'),
+            new SettingField('admin_approval_required', 'Perlu Approval Admin', SettingField::TYPE_TOGGLE, false, 'security',
+                'Akun seller/vendor baru harus di-approve admin sebelum aktif.'),
+
+            // ── 6. Upload Security ──
+            new SettingField('max_upload_file_size', 'Max Upload File (MB)', SettingField::TYPE_NUMBER, 10, 'security',
+                'Batas maksimal ukuran file upload (produk, banner, logo).'),
+            new SettingField('blocked_file_extensions', 'Ekstensi Diblokir', SettingField::TYPE_TEXT, 'exe,php,js,sh,bat,com,dll,scr,msi', 'security',
+                'Ekstensi file yang tidak diizinkan diupload (pisah koma).'),
+
+            // ── 7. Audit & IP ──
+            new SettingField('audit_log_retention_days', 'Retensi Log Aktivitas (hari)', SettingField::TYPE_NUMBER, 90, 'security',
+                'Hapus otomatis log aktivitas lebih dari N hari. 0 = simpan selamanya.'),
+            new SettingField('admin_ip_whitelist_enabled', 'Aktifkan IP Whitelist Admin', SettingField::TYPE_TOGGLE, false, 'security',
+                'Batasi akses admin hanya dari IP tertentu.'),
+            new SettingField('admin_ip_whitelist', 'IP Whitelist Admin', SettingField::TYPE_TEXTAREA, '', 'security',
+                'Alamat IP yang diizinkan (satu IP per baris). Kosong = semua IP ditolak saat fitur aktif.'),
+            new SettingField('sanctum_token_expiration', 'Expiry Token API (hari)', SettingField::TYPE_NUMBER, 0, 'security',
+                'Sanctum token API otomatis expired. 0 = tidak pernah (perhatikan risiko keamanan).'),
         ]));
 
         // === NOTIFICATIONS ===
