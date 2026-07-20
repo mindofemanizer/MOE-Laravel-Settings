@@ -15,7 +15,10 @@
                             \Moe\Settings\Schema\SettingField::TYPE_CHECKBOX_GROUP,
                         ], true);
                         $isToggle = $field->type === \Moe\Settings\Schema\SettingField::TYPE_TOGGLE;
+                        $isR2Field = str_starts_with($field->key, 'r2_') && $group->key === 'storage';
                     @endphp
+
+                    @continue($isR2Field)
 
                     @if ($isToggle)
                         {{-- Toggle: full-width row, label kiri + switch kanan --}}
@@ -139,6 +142,50 @@
                     @endif
                 @endforeach
             </div>
+
+            @if ($group->key === 'storage')
+                <div
+                    x-show="$wire.values.filesystem_default === 'r2'"
+                    x-transition:enter="transition ease-out duration-200"
+                    class="md:col-span-2 rounded-xl border border-outline-variant/40 bg-surface-container-low/70 px-4 py-4 space-y-4"
+                >
+                    <p class="font-body text-body font-semibold text-on-surface flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px] text-primary">cloud</span>
+                        Konfigurasi Cloudflare R2
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+                        @php $r2Fields = array_filter($group->fields, fn($f) => str_starts_with($f->key, 'r2_')); @endphp
+                        @foreach ($r2Fields as $field)
+                            <div class="min-w-0 space-y-1.5" wire:key="r2-{{ $field->key }}">
+                                <label class="font-body text-body font-semibold text-on-surface block" for="pkg-setting-{{ $field->key }}">
+                                    {{ $field->label }}
+                                </label>
+                                @if ($field->type === \Moe\Settings\Schema\SettingField::TYPE_PASSWORD)
+                                    <input
+                                        id="pkg-setting-{{ $field->key }}"
+                                        type="password"
+                                        wire:model="values.{{ $field->key }}"
+                                        placeholder="{{ $passwordMask[$field->key] ?? false ? '•••••••• (tidak diubah)' : $field->placeholder }}"
+                                        class="{{ $inputClass }}"
+                                        autocomplete="new-password"
+                                    >
+                                @else
+                                    <input
+                                        id="pkg-setting-{{ $field->key }}"
+                                        type="text"
+                                        wire:model="values.{{ $field->key }}"
+                                        placeholder="{{ $field->placeholder }}"
+                                        class="{{ $inputClass }}"
+                                    >
+                                @endif
+                                @if ($field->description)
+                                    <p class="text-body-sm text-on-surface-variant leading-snug">{{ $field->description }}</p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <div class="pt-1 border-t border-surface-container flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3">
                 <button

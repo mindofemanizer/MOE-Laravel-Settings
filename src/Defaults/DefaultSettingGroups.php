@@ -56,14 +56,24 @@ class DefaultSettingGroups
             new SettingField('mail_from_name', 'From Name', SettingField::TYPE_TEXT, '', 'mail'),
         ]));
 
-        // === STORAGE (R2 / local) ===
+        // === STORAGE (local / public / R2) ===
         SettingDefinitions::register(new SettingGroup('storage', 'Penyimpanan', 'cloud', [
-            new SettingField('filesystem_default', 'Default Disk', SettingField::TYPE_SELECT, 'local', 'storage', null, ['local' => 'Lokal (Laravel)', 'r2' => 'Cloudflare R2']),
-            new SettingField('r2_key', 'R2 Access Key', SettingField::TYPE_PASSWORD, '', 'storage', description: null, sensitive: true),
-            new SettingField('r2_secret', 'R2 Secret Key', SettingField::TYPE_PASSWORD, '', 'storage', description: null, sensitive: true),
-            new SettingField('r2_bucket', 'R2 Bucket', SettingField::TYPE_TEXT, '', 'storage'),
-            new SettingField('r2_endpoint', 'R2 Endpoint', SettingField::TYPE_TEXT, '', 'storage'),
-            new SettingField('r2_region', 'R2 Region', SettingField::TYPE_TEXT, 'auto', 'storage'),
+            new SettingField('filesystem_default', 'Default Disk', SettingField::TYPE_SELECT, 'local', 'storage',
+                'Disk default untuk upload file. local = storage/app (dev). public = storage/app/public (+ storage:link). r2 = Cloudflare R2.',
+                ['local' => 'Lokal (Laravel)', 'public' => 'Lokal publik (storage/app/public)', 'r2' => 'Cloudflare R2'],
+            ),
+            new SettingField('r2_key', 'R2 Access Key', SettingField::TYPE_PASSWORD, '', 'storage',
+                'Access Key ID dari Cloudflare R2 API Tokens.', sensitive: true),
+            new SettingField('r2_secret', 'R2 Secret Key', SettingField::TYPE_PASSWORD, '', 'storage',
+                'Secret Access Key dari Cloudflare R2 API Tokens.', sensitive: true),
+            new SettingField('r2_bucket', 'R2 Bucket', SettingField::TYPE_TEXT, '', 'storage',
+                'Nama bucket di Cloudflare R2.'),
+            new SettingField('r2_endpoint', 'R2 Endpoint', SettingField::TYPE_TEXT, '', 'storage',
+                'S3-compatible endpoint URL (https://<account>.r2.cloudflarestorage.com).'),
+            new SettingField('r2_region', 'R2 Region', SettingField::TYPE_TEXT, 'auto', 'storage',
+                'Region bucket. Biarkan auto untuk R2.'),
+            new SettingField('r2_url', 'R2 Public URL', SettingField::TYPE_TEXT, '', 'storage',
+                'Public bucket URL (custom domain) agar file bisa diakses via browser. Opsional.'),
         ]));
 
         // === SECURITY ===
